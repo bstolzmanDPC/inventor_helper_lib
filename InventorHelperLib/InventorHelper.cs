@@ -8,28 +8,48 @@ namespace InventorHelperLib
 
         /// <summary>
         /// Derives an .ipt from a .iam and saves it in the same directory.
+        /// Returns resulting file name
         /// </summary>
         /// <param name="AssemblyFileName">Path to the target assembly file</param>
         /// <param name="OptionalProgramId">Optional program identifier (ie. FCAM, ACAD...) Saves as AssemblyFileName_OptionalProgramId.ipt</param>
-        static public void DerivePartFromAssembly(string AssemblyFileName, string OptionalProgramId = "")
+        static public string DerivePartFromAssembly(string AssemblyFileName, string OptionalProgramId = "")
         {
-            //get running application instance
-            Application app = GetInventorObject();
-            app.Visible = true;
+            Application app;
+            try
+            {
+                //get running application instance
+                app = GetInventorObject();
+                app.Visible = true;
 
-            //Create new empty part document to derive into
-            Inventor.PartDocument doc = app.Documents.Add(DocumentTypeEnum.kPartDocumentObject) as PartDocument;
+                //Create new empty part document to derive into
+                Inventor.PartDocument doc = app.Documents.Add(DocumentTypeEnum.kPartDocumentObject) as PartDocument;
 
-            //Create derived assembly definition from assembly file
-            Inventor.DerivedAssemblyDefinition def = doc.ComponentDefinition.ReferenceComponents.DerivedAssemblyComponents.CreateDefinition(AssemblyFileName);
+                //Create derived assembly definition from assembly file
+                Inventor.DerivedAssemblyDefinition def = doc.ComponentDefinition.ReferenceComponents.DerivedAssemblyComponents.CreateDefinition(AssemblyFileName);
 
-            //Derive from definition
-            doc.ComponentDefinition.ReferenceComponents.DerivedAssemblyComponents.Add(def);
+                //Derive from definition
+                doc.ComponentDefinition.ReferenceComponents.DerivedAssemblyComponents.Add(def);
 
-            //Save document with optional program use identifier
-            doc.SaveAs($"{AssemblyFileName}_{OptionalProgramId}.ipt",false);
+                //Save document with optional program use identifier
+                doc.SaveAs($"{AssemblyFileName}_{OptionalProgramId}.ipt", false);
 
-            doc.Close();
+                string fileName = doc.FullFileName;
+
+                doc.Close();
+
+                return fileName;
+            }
+            catch(Exception e)
+            {
+                throw new Exception("An error occured in the InventorHelperLib: " + e.Message);
+            }
+
+            finally
+            {
+                app = null;
+            }
+
+            return "";
 
         }
 
