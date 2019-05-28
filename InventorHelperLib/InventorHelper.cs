@@ -5,7 +5,13 @@ namespace InventorHelperLib
 {
     static public class InventorHelper
     {
-        static public void DerivePartFromAssembly(string AssemblyFileName, string OptionalProgramId)
+
+        /// <summary>
+        /// Derives an .ipt from a .iam and saves it in the same directory.
+        /// </summary>
+        /// <param name="AssemblyFileName">Path to the target assembly file</param>
+        /// <param name="OptionalProgramId">Optional program identifier (ie. FCAM, ACAD...) Saves as AssemblyFileName_OptionalProgramId.ipt</param>
+        static public void DerivePartFromAssembly(string AssemblyFileName, string OptionalProgramId = "")
         {
             //get running application instance
             Application app = GetInventorObject();
@@ -21,7 +27,7 @@ namespace InventorHelperLib
             doc.ComponentDefinition.ReferenceComponents.DerivedAssemblyComponents.Add(def);
 
             //Save document with optional program use identifier
-            doc.SaveAs($"{AssemblyFileName}_{OptionalProgramId}",false);
+            doc.SaveAs($"{AssemblyFileName}_{OptionalProgramId}.ipt",false);
 
             doc.Close();
 
